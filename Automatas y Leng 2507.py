@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
+from tkinter import scrolledtext  
 #-- Comentoarios en naraja son explicacion de ayuda para saber que hace las cossas
 #? Azul muestra mi logica para saber que hago 
 class Aplicacion:
@@ -16,6 +17,19 @@ class Aplicacion:
     def crear_menu1(self):
         menubar = tk.Menu(self.root)
         
+        #-- Menú Archivo logica basada en word 
+        menu_archivo = tk.Menu(menubar, tearoff=0)
+        menu_archivo.add_command(label="Guardar", command=self.guardar)
+        menu_archivo.add_command(label="Guardar como", command=self.guardar_como)
+        #-- Line gis que aparece dividien cerra y guardar
+        menu_archivo.add_separator()
+        menu_archivo.add_command(label="Cerrar", command=self.cerrar)
+        menubar.add_cascade(label="Archivo", menu=menu_archivo)
+        #? Las funciones de guardar guardar como y cerrar se definen abajo para poder tener sepradao los nombre la parte grafica de las funciones 
+        self.root.config(menu=menubar)
+    def crear_menu2(self):
+        menubar = tk.Menu(self.root)
+        #? Esta es la copia que se va usar despues para las acciones 
         #-- Menú Archivo logica basada en word 
         menu_archivo = tk.Menu(menubar, tearoff=0)
         menu_archivo.add_command(label="Guardar", command=self.guardar)
@@ -48,27 +62,63 @@ class Aplicacion:
 
 
     def crear_marco_principal(self):
-        """Crea el contenedor principal para las ventanas"""
-        self.marco_principal = tk.Frame(self.root, bg="#f0f0f0", padx=10, pady=10)
+    
+    # --Marco principal 
+        self.marco_principal = tk.PanedWindow(self.root, orient=tk.HORIZONTAL, bg="#f0f0f0")
         self.marco_principal.pack(fill=tk.BOTH, expand=True)
-        
-        # Etiqueta temporal para ver el marco
-        tk.Label(self.marco_principal, text="Proyecto de automatas", 
-                bg="lightblue").pack(fill=tk.X, pady=50)
+    
+    # --- VENTANA 1 (Editor de texto) ---
         self.ventana1 = tk.LabelFrame(
-            self.marco_principal, 
-            text="Hola",  
-            padx=15, 
-            pady=15,
-            
-        )
-
-        self.ventana_secundaria = tk.LabelFrame(
-            self.marco_principal,
-            text="Configuración",
-            padx=15,
-            pady=15
-        )
+        self.marco_principal, 
+        text="Ventana 1", 
+        #-- El pad es el que mueve espacios entere las ventanas  
+        padx=5, 
+        pady=5,
+        bg="white"
+    )
+    
+    
+        self.scroll_text1 = scrolledtext.ScrolledText(
+        self.ventana1,
+        wrap=tk.WORD,
+        width=40,
+        height=40,
+        font=('Arial', 10),
+        bg="#f9f9f9"
+    )
+        self.scroll_text1.pack(fill=tk.BOTH, expand=True)
+    
+    # --- VENTANA 2 (Donde se va a ver el archivo despues ) ---
+    #? El lable Frame es el que se mira arriba lo uso para diferencianr ventanas 
+    #? Este borde no mas es estetica ya que no ayuda se sustituya por el elble celeste proyecto autmatas 
+        self.ventana2 = tk.LabelFrame(
+        self.marco_principal,
+        text="Ventana 2",
+        padx=5,
+        pady=5,
+        bg="Blue"
+    )
+    
+    
+        self.scroll_text2 = scrolledtext.ScrolledText(
+        self.ventana2,
+        wrap=tk.WORD,
+        width=200,
+        height=200,
+        font=('Arial', 10),
+        bg="#f9f9f9"
+    )
+        self.scroll_text2.pack(fill=tk.BOTH, expand=True)
+    
+    # ? Utiliz self que segun entiendo es lo que permite decir a que marco se va incorporar 
+    #? marco principal se le llamo al cuador donde esta archivo 
+        self.marco_principal.add(self.ventana1)
+        self.marco_principal.add(self.ventana2)
+    
+    
+        self.marco_principal.paneconfig(self.ventana1, minsize=400)
+        self.marco_principal.paneconfig(self.ventana2, minsize=400)
+       
         
        
       
@@ -79,3 +129,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = Aplicacion(root)
     root.mainloop()
+#!Debe abrir y guradar las ventanas  agregar iconos  la otra versin de archivos es token indetificar clasificar ademas de cargar un archivo .txt 
+
