@@ -1,32 +1,48 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import scrolledtext  
+from tkinter import PhotoImage
+import os
 #-- Comentoarios en naraja son explicacion de ayuda para saber que hace las cossas
 #? Azul muestra mi logica para saber que hago 
 class Aplicacion:
     def __init__(self, root):
         self.root = root
         self.root.title("Interfaz ")
-        self.root.geometry("800x600")
+        self.root.geometry("1060x1060")
+        self.cargar_iconos()
         self.crear_menu1()
         self.crear_marco_principal()
 
 
-
+    def cargar_iconos(self):
+       
+       
+            #-- Como dato por alguna razon los iconos a mas grande numerov mas pequeños
+           self.icono_guardar = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\imgGuardar2.png').subsample(4, 4)
+           self.icono_guardarComo = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\imgGuardar.png').subsample(4, 4)
+           self.icono_cerrar = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\imgCerrar.png').subsample(4, 4)
+            
 
     def crear_menu1(self):
         menubar = tk.Menu(self.root)
         
         #-- Menú Archivo logica basada en word 
         menu_archivo = tk.Menu(menubar, tearoff=0)
-        menu_archivo.add_command(label="Guardar", command=self.guardar)
-        menu_archivo.add_command(label="Guardar como", command=self.guardar_como)
+
+        
+        menu_archivo.add_command(label="Guardar", command=self.guardar,image=self.icono_guardar,compound=tk.LEFT)
+        menu_archivo.add_command(label="Guardar como", command=self.guardar_como,image=self.icono_guardarComo,compound=tk.LEFT)
         #-- Line gis que aparece dividien cerra y guardar
         menu_archivo.add_separator()
-        menu_archivo.add_command(label="Cerrar", command=self.cerrar)
+        menu_archivo.add_command(label="Cerrar", command=self.cerrar,image=self.icono_cerrar,compound=tk.LEFT)
         menubar.add_cascade(label="Archivo", menu=menu_archivo)
+
+
+
         #? Las funciones de guardar guardar como y cerrar se definen abajo para poder tener sepradao los nombre la parte grafica de las funciones 
         self.root.config(menu=menubar)
+
     def crear_menu2(self):
         menubar = tk.Menu(self.root)
         #? Esta es la copia que se va usar despues para las acciones 
@@ -34,7 +50,7 @@ class Aplicacion:
         menu_archivo = tk.Menu(menubar, tearoff=0)
         menu_archivo.add_command(label="Guardar", command=self.guardar)
         menu_archivo.add_command(label="Guardar como", command=self.guardar_como)
-        #-- Line gis que aparece dividien cerra y guardar
+        #-- Linea gris que aparece dividien cerra y guardar
         menu_archivo.add_separator()
         menu_archivo.add_command(label="Cerrar", command=self.cerrar)
         menubar.add_cascade(label="Archivo", menu=menu_archivo)
@@ -72,8 +88,8 @@ class Aplicacion:
         self.marco_principal, 
         text="Ventana 1", 
         #-- El pad es el que mueve espacios entere las ventanas  
-        padx=5, 
-        pady=5,
+        padx=4, 
+        pady=4,
         bg="white"
     )
     
@@ -94,8 +110,8 @@ class Aplicacion:
         self.ventana2 = tk.LabelFrame(
         self.marco_principal,
         text="Ventana 2",
-        padx=5,
-        pady=5,
+        padx=4,
+        pady=4,
         bg="Blue"
     )
     
@@ -129,5 +145,5 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = Aplicacion(root)
     root.mainloop()
-#!Debe abrir y guradar las ventanas  agregar iconos  la otra versin de archivos es token indetificar clasificar ademas de cargar un archivo .txt 
+#!Debe abrir y guradar las ventanas  agregar iconos  la otra versin de archivos es token indetificar clasificar ademas de cargar un archivo .py
 
