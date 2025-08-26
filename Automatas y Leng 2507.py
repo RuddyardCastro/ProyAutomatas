@@ -13,7 +13,7 @@ class Aplicacion:
         self.crear_menu1()
         self.crear_marco_principal()
         self.configurar_drag_drop() 
-
+#-- Modificar las imagenes 
     def cargar_iconos(self):
         try:
             self.icono_guardar = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\img\imgGuardar2.png').subsample(4, 4)
@@ -23,6 +23,8 @@ class Aplicacion:
         except:
             messagebox.showerror("Error", "No se pudieron cargar los iconos")
 
+            
+#-- Botones elementos graficos 
     def crear_menu1(self):
         menubar = tk.Menu(self.root)
         
@@ -33,11 +35,32 @@ class Aplicacion:
         menu_archivo.add_command(label="Cerrar", command=self.cerrar, image=self.icono_cerrar, compound=tk.LEFT)
         menubar.add_cascade(label="Archivo", menu=menu_archivo)
         
+        # Menú Analizar con opción Seleccionar
+        menu_analizar = tk.Menu(menubar, tearoff=0)
+        menu_analizar.add_command(label="Seleccionar", command=self.seleccionar)
+        menubar.add_cascade(label="Analizar", menu=menu_analizar)
         
         menu_archivo.insert_command(0, label="Abrir", command=self.abrir_archivo ,image=self.icono_abrir, compound=tk.LEFT  )
-        
-        self.root.config(menu=menubar)
 
+
+
+    #-- Funciones de las acciones den el menu     
+        self.root.config(menu=menubar)
+    def guardar(self):
+        messagebox.showinfo("Guardar", "Función Guardar ")
+
+    def guardar_como(self):
+        file = filedialog.asksaveasfilename()
+        if file:
+            messagebox.showinfo("Guardar como", f"Archivo se guardará como: {file}")
+        
+    def cerrar(self):
+        if messagebox.askokcancel("Cerrar", "¿Está seguro que desea cerrar la aplicación?"):
+            self.root.destroy()
+    def seleccionar(self):
+        # Función vacía para la opción Seleccionar (sin acción)
+        pass
+#  * aqui se modifica el abrir de archivo  
     def configurar_drag_drop(self):
        
         self.scroll_text1.bind('<Double-Button-1>', self.abrir_archivo)
@@ -66,7 +89,7 @@ class Aplicacion:
                     
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir el archivo:\n{str(e)}")
-
+    #? ---------------------Crecion de los componentes fisicos -------------------------------------------
     def crear_marco_principal(self):
         # -- Marco principal 
         self.marco_principal = tk.PanedWindow(self.root, orient=tk.HORIZONTAL, bg="#f0f0f0")
@@ -112,22 +135,12 @@ class Aplicacion:
     
         self.marco_principal.add(self.ventana1)
         self.marco_principal.add(self.ventana2)
-    
+    #-- Modfifcar el tamaño de las ventanas 
         self.marco_principal.paneconfig(self.ventana1, minsize=400)
         self.marco_principal.paneconfig(self.ventana2, minsize=400)
 
 
-    def guardar(self):
-        messagebox.showinfo("Guardar", "Función Guardar ")
-
-    def guardar_como(self):
-        file = filedialog.asksaveasfilename()
-        if file:
-            messagebox.showinfo("Guardar como", f"Archivo se guardará como: {file}")
-        
-    def cerrar(self):
-        if messagebox.askokcancel("Cerrar", "¿Está seguro que desea cerrar la aplicación?"):
-            self.root.destroy()
+    
 
 
 if __name__ == "__main__":
