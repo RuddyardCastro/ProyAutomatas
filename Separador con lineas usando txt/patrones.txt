@@ -1,0 +1,4 @@
+^".*?"$,CADENA
+^\d+\.\d+$,NUMERO
+^\d+$,NUMERO
+^[a-zA-Z_][a-zA-Z0-9_]*$,IDENTIFICADOR
