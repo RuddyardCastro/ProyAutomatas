@@ -27,20 +27,23 @@ class Aplicacion:
 #-- Botones elementos graficos 
     def crear_menu1(self):
         menubar = tk.Menu(self.root)
-        
+      #? Munu archivo  
         menu_archivo = tk.Menu(menubar, tearoff=0)
         menu_archivo.add_command(label="Guardar", command=self.guardar, image=self.icono_guardar, compound=tk.LEFT)
         menu_archivo.add_command(label="Guardar como", command=self.guardar_como, image=self.icono_guardarComo, compound=tk.LEFT)
         menu_archivo.add_separator()
         menu_archivo.add_command(label="Cerrar", command=self.cerrar, image=self.icono_cerrar, compound=tk.LEFT)
         menubar.add_cascade(label="Archivo", menu=menu_archivo)
-        
-        # Menú Analizar con opción Seleccionar
-        menu_analizar = tk.Menu(menubar, tearoff=0)
-        menu_analizar.add_command(label="Seleccionar", command=self.seleccionar)
-        menubar.add_cascade(label="Analizar", menu=menu_analizar)
-        
         menu_archivo.insert_command(0, label="Abrir", command=self.abrir_archivo ,image=self.icono_abrir, compound=tk.LEFT  )
+
+
+        #? Menú Analizar con opción Seleccionar
+        menu_analizar = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Analizar", menu=menu_analizar)
+        menu_analizar.add_command(label="Seleccionar", command=self.seleccionar)
+        
+        
+        
 
 
 
@@ -58,7 +61,7 @@ class Aplicacion:
         if messagebox.askokcancel("Cerrar", "¿Está seguro que desea cerrar la aplicación?"):
             self.root.destroy()
     def seleccionar(self):
-        # Función vacía para la opción Seleccionar (sin acción)
+        
         pass
 #  * aqui se modifica el abrir de archivo  
     def configurar_drag_drop(self):
