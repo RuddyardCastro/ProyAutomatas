@@ -4,6 +4,9 @@ from tkinter import scrolledtext
 from tkinter import PhotoImage
 import os
 
+
+from analizador import Separar_Token
+
 class Aplicacion:
     def __init__(self, root):
         self.root = root
@@ -60,9 +63,33 @@ class Aplicacion:
     def cerrar(self):
         if messagebox.askokcancel("Cerrar", "¿Está seguro que desea cerrar la aplicación?"):
             self.root.destroy()
+    
     def seleccionar(self):
+        # Obtener el contenido de scroll_text1
+        contenido = self.scroll_text1.get('1.0', tk.END).strip()
         
-        pass
+        if not contenido:
+            messagebox.showwarning("Advertencia", "El área de texto está vacía. Por favor, ingrese o cargue un archivo.")
+            return
+
+        try:
+            # Analizar el contenido con Separar_Token
+            tokens = Separar_Token(contenido)
+            
+            # Formatear la salida
+            resultado = ""
+            for token in tokens:
+                resultado += f"Línea {token['linea']}: {token['tipo']}({token['valor']})\n"
+            
+            # Mostrar el resultado en scroll_text2
+            self.scroll_text2.delete('1.0', tk.END)
+            self.scroll_text2.insert(tk.END, resultado)
+            
+            messagebox.showinfo("Éxito", "Análisis completado. Los tokens se muestran en la ventana 2.")
+        except Exception as e:
+            messagebox.showerror("Error", f"No se pudo analizar el texto: {str(e)}")
+    
+
 #  * aqui se modifica el abrir de archivo  
     def configurar_drag_drop(self):
        
