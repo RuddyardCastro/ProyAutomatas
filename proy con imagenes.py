@@ -1,3 +1,5 @@
+10  
+
 import tkinter as tk
 from tkinter import filedialog, messagebox
 from tkinter import scrolledtext  
@@ -135,7 +137,7 @@ class Aplicacion:
         self.marco_principal.paneconfig(self.ventana1, minsize=400)
         self.marco_principal.paneconfig(self.ventana2, minsize=400)
        
-        
+      
        
       
 
