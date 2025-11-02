@@ -8,3 +8,6 @@ IF
 ELSE
 ELIF
 RETURN
+as
+tkinter
+PRINT
