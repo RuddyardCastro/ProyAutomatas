@@ -58,13 +58,14 @@ class AFD_analizar:
             return all(c.isalnum() or c == "_" for c in palabra[1:])
         return False
 
-    # ---------- Análisis sintáctico ----------
+    # ---------- Análisis sintáctico mejorado ----------
     def analizar_sintaxis(self, tokens):
         """
-        Reglas básicas:
-        - ID = NUM|ID|STR
+        Reglas básicas mejoradas:
+        - ID = NUM|ID|STR|CADENA
         - No iniciar línea con NUM
         - Detectar tokens inválidos
+        - Detectar identificadores inválidos (que inician con número)
         """
         errores = []
         i = 0
@@ -74,23 +75,27 @@ class AFD_analizar:
             val = t['valor']
             linea = t['linea']
 
-            # Token inválido
-            if tipo not in ('ID','NUM','PR','OP','CADENA','STR'):
+            #  Token inválido (no reconocido)
+            if tipo not in ('ID', 'NUM', 'PR', 'OP', 'CADENA', 'STR'):
                 errores.append(f"L{linea}: Token inválido '{val}'")
 
-            # Línea inicia con número → error
-            if tipo in ('NUM') and (i == 0 or tokens[i-1]['linea'] != linea):
+            #  Línea que inicia con número
+            if tipo == 'NUM' and (i == 0 or tokens[i-1]['linea'] != linea):
                 errores.append(f"L{linea}: No puede iniciar con número '{val}'")
 
-            # Asignación simple: ID = NUM|ID|CADENA|STR
-            if tipo == 'ID' and i+1 < len(tokens) and tokens[i+1]['valor'] == '=':
-                if i+2 >= len(tokens):
+            #  Identificador inválido (empieza con número)
+            if tipo == 'ID' and not self._es_identificador(val):
+                errores.append(f"L{linea}: Identificador inválido '{val}'")
+
+            #  Asignación simple: ID = NUM|ID|CADENA|STR
+            if tipo == 'ID' and i + 1 < len(tokens) and tokens[i + 1]['valor'] == '=':
+                if i + 2 >= len(tokens):
                     errores.append(f"L{linea}: Falta expresión después de '='")
                 else:
-                    siguiente = tokens[i+2]
-                    if siguiente['tipo'] not in ('ID','NUM','CADENA','STR'):
+                    siguiente = tokens[i + 2]
+                    if siguiente['tipo'] not in ('ID', 'NUM', 'CADENA', 'STR'):
                         errores.append(f"L{linea}: Expresión inválida después de '=': '{siguiente['valor']}'")
-                i += 2  # saltar '=' y siguiente token
+                i += 2  # saltar '=' y el siguiente token
 
             i += 1
 
