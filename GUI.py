@@ -3,9 +3,11 @@ from tkinter import filedialog, messagebox
 from tkinter import scrolledtext  
 from tkinter import PhotoImage
 import os
+import tkinter.ttk as ttk  
 
 from Clasificar import Separador_Lexico
 from AFD import AFD_analizar
+from TablaSimbolos import TablaSimbolos
 
 class Aplicacion:
     def __init__(self, root):
@@ -16,10 +18,13 @@ class Aplicacion:
         self.crear_menu1()
         self.crear_interfaz_principal()
         self.configurar_drag_drop() 
-        
+       
+
         # Inicializar ambos analizadores
         self.analizador_lexico = Separador_Lexico()
         self.analizador_sintactico = AFD_analizar()
+        self.tabla_simbolos = TablaSimbolos(self.root, self.analizador_lexico)
+
         
     def cargar_iconos(self):
         try:
@@ -34,7 +39,7 @@ class Aplicacion:
 
     def crear_menu1(self):
         menubar = tk.Menu(self.root)
-        
+       
         # Menú Archivo
         menu_archivo = tk.Menu(menubar, tearoff=0)
         menu_archivo.add_command(label="Abrir", command=self.abrir_archivo, image=self.icono_abrir, compound=tk.LEFT)
@@ -49,7 +54,10 @@ class Aplicacion:
         menu_analizar.add_command(label="Análisis Léxico", command=self.analizar_lexico, image=self.icono_analizar, compound=tk.LEFT)
         menu_analizar.add_command(label="Análisis Sintáctico", command=self.analizar_sintactico, image=self.icono_sintactico, compound=tk.LEFT)
         menubar.add_cascade(label="Analizar", menu=menu_analizar)
-        
+
+
+        menu_analizar.add_separator()
+        menu_analizar.add_command(label="Tabla de Símbolos", command=self.mostrar_tabla_simbolos)
         self.root.config(menu=menubar)
 
     def crear_interfaz_principal(self):
@@ -134,6 +142,32 @@ class Aplicacion:
         self.marco_principal.paneconfig(self.marco_superior, minsize=400)
         self.marco_principal.paneconfig(self.terminal, minsize=200)
 
+    
+    def mostrar_tabla_simbolos(self):
+        contenido = self.scroll_text1.get('1.0', tk.END)
+        self.tabla_simbolos.mostrar_tabla(contenido)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     # ------------------ Análisis Léxico ------------------
     def analizar_lexico(self):
         contenido = self.scroll_text1.get('1.0', tk.END).strip()
@@ -170,12 +204,12 @@ class Aplicacion:
             messagebox.showwarning("Advertencia", "El área de texto está vacía.")
             return
         try:
-            # 1️⃣ Separar tokens
+            #  Separar tokens
             tokens = self.analizador_lexico.separar_token(contenido)
-            # 2️⃣ Analizar sintaxis
+            # Analizar sintaxis
             errores = self.analizador_sintactico.analizar_sintaxis(tokens)
             
-            # 3️⃣ Mostrar tokens en Ventana 2
+            # Mostrar tokens en Ventana 2
             resultado_tokens = ""
             linea_actual = 0
             for token in tokens:
@@ -188,7 +222,7 @@ class Aplicacion:
             self.scroll_text2.delete('1.0', tk.END)
             self.scroll_text2.insert(tk.END, resultado_tokens)
             
-            # 4️⃣ Mostrar errores
+            #  Mostrar errores
             self.terminal_text.delete('1.0', tk.END)
             if errores:
                 for e in errores:
@@ -196,7 +230,7 @@ class Aplicacion:
             else:
                 self.terminal_text.insert(tk.END, "No se encontraron errores sintácticos.")
 
-            # 5️⃣ Mensaje final
+    
             messagebox.showinfo("Análisis Sintáctico",
                                 f"Tokens identificados: {len(tokens)}\nErrores: {len(errores)}")
         except Exception as e:

@@ -1,4 +1,5 @@
 class AFD_analizar:
+    # ---------- Métodos de carga ----------
     def __init__(self):
         # Rutas de archivos
         self.ruta_ops = r"C:\Users\Ruddyard\Desktop\ProyEnGit\archivos\Archivos de diccionario\operadores\operadores.txt"
@@ -6,30 +7,30 @@ class AFD_analizar:
         self.ruta_ptn = r"C:\Users\Ruddyard\Desktop\ProyEnGit\archivos\Archivos de diccionario\patrones\patrones.txt"
 
         # Cargar datos
-        self.ops = self._cargar_operadores()
-        self.prs = self._cargar_palabras_reservadas()
-        self.patrones_tokens = self._cargar_patrones()
+        self.ops = self.cargar_operadores()
+        self.prs = self.cargar_palabras_reservadas()
+        self.patrones_tokens = self.cargar_patrones()
 
         # Ordenar operadores de mayor a menor longitud
         self.ops.sort(key=len, reverse=True)
 
-    # ---------- Métodos de carga ----------
-    def _cargar_desde_archivo(self, ruta):
+   
+    def cargar_desde_archivo(self, ruta):
         try:
             with open(ruta, 'r', encoding='utf-8') as f:
                 return [linea.strip() for linea in f if linea.strip()]
         except:
             return []
 
-    def _cargar_operadores(self):
-        return [op.upper() for op in self._cargar_desde_archivo(self.ruta_ops)]
+    def cargar_operadores(self):
+        return [op.upper() for op in self.cargar_desde_archivo(self.ruta_ops)]
 
-    def _cargar_palabras_reservadas(self):
-        return [pr.upper() for pr in self._cargar_desde_archivo(self.ruta_prs)]
+    def cargar_palabras_reservadas(self):
+        return [pr.upper() for pr in self.cargar_desde_archivo(self.ruta_prs)]
 
-    def _cargar_patrones(self):
+    def cargar_patrones(self):
         patrones = []
-        for linea in self._cargar_desde_archivo(self.ruta_ptn):
+        for linea in self.cargar_desde_archivo(self.ruta_ptn):
             if ',' in linea:
                 regex, tipo = linea.split(',', 1)
                 patrones.append((regex.strip(), tipo.strip()))
@@ -37,13 +38,11 @@ class AFD_analizar:
 
     # ---------- Método principal: separar token ----------
     def separar_token(self, cTexto, separador_lexico):
-        """
-        Usa Separador_Lexico para obtener tokens
-        """
+     
         return separador_lexico.separar_token(cTexto)
 
     # ---------- Métodos auxiliares ----------
-    def _es_numero(self, palabra):
+    def Es_num(self, palabra):
         if not palabra:
             return False
         if palabra.count('.') == 1:
@@ -51,22 +50,15 @@ class AFD_analizar:
             return p1.isdigit() and p2.isdigit()
         return palabra.isdigit()
 
-    def _es_identificador(self, palabra):
+    def Es_id(self, palabra):
         if not palabra:
             return False
         if palabra[0].isalpha() or palabra[0] == "_":
             return all(c.isalnum() or c == "_" for c in palabra[1:])
         return False
 
-    # ---------- Análisis sintáctico mejorado ----------
+   #---------------------------------------------------------------------------
     def analizar_sintaxis(self, tokens):
-        """
-        Reglas básicas mejoradas:
-        - ID = NUM|ID|STR|CADENA
-        - No iniciar línea con NUM
-        - Detectar tokens inválidos
-        - Detectar identificadores inválidos (que inician con número)
-        """
         errores = []
         i = 0
         while i < len(tokens):
@@ -75,19 +67,24 @@ class AFD_analizar:
             val = t['valor']
             linea = t['linea']
 
-            #  Token inválido (no reconocido)
-            if tipo not in ('ID', 'NUM', 'PR', 'OP', 'CADENA', 'STR'):
+           
+            if tipo == 'Coment':
+                i += 1
+                continue
+
+            # Verificación token inválido
+            if tipo not in ('ID', 'NUM', 'PR', 'OP', 'CADENA', 'STR', 'Coment'):
                 errores.append(f"L{linea}: Token inválido '{val}'")
 
-            #  Línea que inicia con número
+            
             if tipo == 'NUM' and (i == 0 or tokens[i-1]['linea'] != linea):
                 errores.append(f"L{linea}: No puede iniciar con número '{val}'")
 
-            #  Identificador inválido (empieza con número)
-            if tipo == 'ID' and not self._es_identificador(val):
+            # Verificación identificador válido
+            if tipo == 'ID' and not self.Es_id(val):
                 errores.append(f"L{linea}: Identificador inválido '{val}'")
 
-            #  Asignación simple: ID = NUM|ID|CADENA|STR
+            # Verificación asignación
             if tipo == 'ID' and i + 1 < len(tokens) and tokens[i + 1]['valor'] == '=':
                 if i + 2 >= len(tokens):
                     errores.append(f"L{linea}: Falta expresión después de '='")
@@ -95,7 +92,7 @@ class AFD_analizar:
                     siguiente = tokens[i + 2]
                     if siguiente['tipo'] not in ('ID', 'NUM', 'CADENA', 'STR'):
                         errores.append(f"L{linea}: Expresión inválida después de '=': '{siguiente['valor']}'")
-                i += 2  # saltar '=' y el siguiente token
+                i += 2  
 
             i += 1
 
