@@ -1,7 +1,7 @@
 class AFD_analizar:
     # ---------- Métodos de carga ----------
     def __init__(self):
-        # Rutas de archivos
+        
         self.ruta_ops = r"C:\Users\Ruddyard\Desktop\ProyEnGit\archivos\Archivos de diccionario\operadores\operadores.txt"
         self.ruta_prs = r"C:\Users\Ruddyard\Desktop\ProyEnGit\archivos\Archivos de diccionario\palabras reservadas\palabrasReservadas.txt"
         self.ruta_ptn = r"C:\Users\Ruddyard\Desktop\ProyEnGit\archivos\Archivos de diccionario\patrones\patrones.txt"
@@ -36,12 +36,12 @@ class AFD_analizar:
                 patrones.append((regex.strip(), tipo.strip()))
         return patrones
 
-    # ---------- Método principal: separar token ----------
+    # ---------- Método  separar token ----------
     def separar_token(self, cTexto, separador_lexico):
      
         return separador_lexico.separar_token(cTexto)
 
-    # ---------- Métodos auxiliares ----------
+    # ---------- Métodos extras ----------
     def Es_num(self, palabra):
         if not palabra:
             return False

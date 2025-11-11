@@ -11,3 +11,5 @@ RETURN
 as
 tkinter
 PRINT
+token
+splitlines

@@ -20,7 +20,7 @@ class Aplicacion:
         self.configurar_drag_drop() 
        
 
-        # Inicializar ambos analizadores
+        # Inicializar  analizadores
         self.analizador_lexico = Separador_Lexico()
         self.analizador_sintactico = AFD_analizar()
         self.tabla_simbolos = TablaSimbolos(self.root, self.analizador_lexico)

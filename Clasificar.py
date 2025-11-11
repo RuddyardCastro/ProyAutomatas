@@ -99,41 +99,47 @@ class Separador_Lexico:
                     continue
 
                 palabra = ""
-                while i < len(linea) and not linea[i].isspace() and all(
-                    not linea[i:].upper().startswith(op) for op in self.ops
-                ):
+                if cont.isalnum() or cont == '_':
                     palabra += linea[i]
                     i += 1
+                    while i < len(linea) and (linea[i].isalnum() or linea[i] == '_'):
+                        palabra += linea[i]
+                        i += 1
+                else:
+                    palabra = cont 
+                    i += 1
+                
+                if palabra:
+                    palabra_up = palabra.upper()
 
-                palabra_up = palabra.upper()
+                    if palabra_up in self.prs:
+                        tokens_result.append({
+                            'tipo': 'PR',
+                            'valor': palabra,
+                            'linea': num_linea
+                        })
+                        continue
 
-                if palabra_up in self.prs:
-                    tokens_result.append({
-                        'tipo': 'PR',
-                        'valor': palabra,
-                        'linea': num_linea
-                    })
-                    continue
+                    if self.es_numero(palabra):
+                        tokens_result.append({
+                            'tipo': 'NUM',
+                            'valor': palabra,
+                            'linea': num_linea
+                        })
+                        continue
+                    
+                    elif self.es_identificador(palabra):
+                        tokens_result.append({
+                            'tipo': 'ID',
+                            'valor': palabra,
+                            'linea': num_linea
+                        })
+                        continue
 
-                if self.es_numero(palabra):
-                    tokens_result.append({
-                        'tipo': 'NUM',
-                        'valor': palabra,
-                        'linea': num_linea
-                    })
-                    continue
-                elif self.es_identificador(palabra):
                     tokens_result.append({
                         'tipo': 'ID',
                         'valor': palabra,
                         'linea': num_linea
                     })
-                    continue
-
-                tokens_result.append({
-                    'tipo': 'ID',
-                    'valor': palabra,
-                    'linea': num_linea
-                })
 
         return tokens_result
