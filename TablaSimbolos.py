@@ -1,76 +1,61 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-# Nota: La importación de Separador_Lexico debe estar en GUI.py y no es necesaria aquí si se pasa por constructor.
 
 class TablaSimbolos:
     def __init__(self, root, analizador_lexico):
         self.root = root
-        # El analizador léxico se pasa para obtener los tokens una sola vez.
         self.analizador_lexico = analizador_lexico
     
     def _obtener_tipo_y_categoria(self, tipo, valor):
-        """
-        Realiza el análisis semántico usando el resultado léxico.
-        Utiliza 'tipo' y 'valor' para asignar la Categoría y Tipo de Dato.
-        """
         
-        # --- Lógica de Palabras Reservadas (PR) ---
         if tipo == "PR":
             valor_up = valor.upper()
             
-            # [cite_start]1. Clasificación Booleana (si están en PR.txt [cite: 3])
             if valor_up == "TRUE" or valor_up == "FALSE":
                 return "Constante", "Booleano (bool)"
             
-            # 2. PRs de control de flujo
-            elif valor_up in ["DEF", "IMPORT", "FOR", "WHILE", "IF", "ELSE", "ELIF", "RETURN"]:
+            elif valor_up in ["DEF", "IMPORT", "IF", "ELSE", "ELIF", "RETURN"]:
                 return "Palabra Reservada", "(Control)"
+            elif valor_up in ["FOR", "WHILE"]:
+                return "Estructura de Control", "Ciclo"
             
-            # 3. Funciones predefinidas
             elif valor_up == "PRINT":
                 return "Función", "(Predefinida)"
             
-            # [cite_start]4. PRs mal clasificadas que deberían ser ID (self, tkinter, as, etc.) [cite: 3]
             elif valor_up in ["SELF", "TKINTER", "AS", "TOKEN", "SPLITLINES"]:
                 if valor_up == "SELF":
-                    # Si bien está mal clasificado, semánticamente es un parámetro
                     return "Parámetro/Instancia", "Objeto de Instancia"
                 return "Identificador/Componente", "Error Léxico/ID"
         
-        # --- Lógica de Números (NUM) ---
         elif tipo == "NUM":
-            # Se usa el valor para distinguir entre Entero (int) y Decimal (float)
             if "." in valor:
                 return "Literal Numérico", "Decimal (float)"
             else:
                 return "Literal Numérico", "Entero (int)"
 
-        # --- Lógica de Cadenas (STR) ---
         elif tipo == "STR":
             return "Literal", "Cadena (str)"
             
-        # --- Lógica de Identificadores (ID) ---
         elif tipo == "ID":
             valor_low = valor.lower()
             
-            # Manejo de identificadores especiales (si se hubieran clasificado correctamente como ID)
             if valor_low == "self":
                 return "Parámetro/Instancia", "Objeto de Instancia"
             elif valor_low == "tk":
                 return "Módulo/Biblioteca", "Objeto Módulo"
             
-            # Constantes (ej. tk.LEFT)
-            elif valor.isupper():
+            if valor.isupper():
                 return "Constante de Clase", "Constante"
+            
+            if valor in ["crear_menu1", "abrir_archivo", "guardar", "cerrar", "limpiar_todo"]:
+                return "Función/Método", "Referencia de Función"
+            elif valor in ["menubar", "menu_archivo", "marco_principal", "ventana1", "scroll_text1", "analizador_lexico", "analizador_sintactico"]:
+                return "Variable/Objeto", "Objeto (vario)"
+            
+            return "Variable/ID", "Objeto (vario)"
 
-            # Variables/Funciones/Métodos
-            else:
-                # Categorización basada en el contexto del código
-                if valor in ["crear_menu1", "abrir_archivo", "guardar", "cerrar"]:
-                    return "Función/Método", "Referencia de Función"
-                elif valor in ["menubar", "menu_archivo"]:
-                    return "Variable Local", "Objeto tk.Menu"
-                return "Variable/ID", "Objeto (vario)"
+        elif tipo == "OP" and valor in ["[]"]:
+            return "Literal", "Lista/Arreglo"
         
         return "Desconocido", "Error de Tipo"
 
@@ -80,56 +65,78 @@ class TablaSimbolos:
             messagebox.showwarning("Advertencia", "El área de texto está vacía.")
             return
 
-        # PASO 1: Obtener tokens (Clasificación Léxica única)
         tokens = self.analizador_lexico.separar_token(contenido)
 
-        simbolos = []
-        simbolos_unicos = set()
+        simbolos_por_nombre = {}
 
-        for token in tokens:
-            tipo = token["tipo"]
-            valor = token["valor"]
+        i = 0
+        while i < len(tokens):
+            token = tokens[i]
             
-            # Solo procesamos elementos que se muestran en la tabla
-            if tipo in ["ID", "PR", "NUM", "STR"]:
+            if token["tipo"] == "ID" and i + 1 < len(tokens) and tokens[i+1]["valor"] == "=":
                 
-                # Clave para unicidad (para evitar repetición de "Abrir", "Guardar", etc.)
-                nombre_clave = valor if tipo in ["ID", "PR"] else f"{tipo}_{valor}"
+                nombre = token["valor"]
                 
-                if nombre_clave not in simbolos_unicos:
-                    simbolos_unicos.add(nombre_clave)
+                if i + 2 < len(tokens):
+                    valor_token = tokens[i+2]
+                    tipo_valor = valor_token["tipo"]
+                    valor_valor = valor_token["valor"]
                     
-                    # PASO 2: Obtener Categoría y Tipo de Dato (Análisis Semántico)
-                    categoria, tipo_dato = self._obtener_tipo_y_categoria(tipo, valor)
+                    categoria_valor, tipo_dato = self._obtener_tipo_y_categoria(tipo_valor, valor_valor)
                     
-                    simbolos.append({
-                        "nombre": valor,
-                        "categoria": categoria,
+                    categoria_final, _ = self._obtener_tipo_y_categoria("ID", nombre)
+                    
+                    simbolos_por_nombre[nombre] = {
+                        "nombre": nombre,
+                        "categoria": categoria_final,
                         "tipo_dato": tipo_dato,
-                    })
+                        "valor": valor_valor.strip('"')
+                    }
+                    
+                i += 3 
+                continue 
+            
+            elif token["tipo"] == "PR" or token["tipo"] == "ID":
+                nombre = token["valor"]
+                
+                if nombre not in simbolos_por_nombre: 
+                    
+                    categoria, tipo_dato = self._obtener_tipo_y_categoria(token["tipo"], nombre)
 
-        # --- Creación de la Interfaz (SOLO 3 Columnas) ---
+                    if "Función/Método" in categoria or "Estructura de Control" in categoria or token["tipo"] == "PR":
+                        simbolos_por_nombre[nombre] = {
+                            "nombre": nombre,
+                            "categoria": categoria,
+                            "tipo_dato": tipo_dato,
+                            "valor": "-"
+                        }
+
+            i += 1
+            
+        simbolos = list(simbolos_por_nombre.values())
+        
         ventana_tabla = tk.Toplevel(self.root)
         ventana_tabla.title("Tabla de Símbolos")
-        ventana_tabla.geometry("750x400")
-
-        # Headder con 3 columnas
-        columnas = ("Nombre del Símbolo", "Categoría", "Tipo de Dato")
+        ventana_tabla.geometry("950x400")
+        
+        columnas = ("Nombre del Símbolo", "Categoría", "Tipo de Dato", "Valor")
         tabla = ttk.Treeview(ventana_tabla, columns=columnas, show='headings')
+        
+        tabla.column("Nombre del Símbolo", anchor='center', width=200)
+        tabla.column("Categoría", anchor='center', width=200)
+        tabla.column("Tipo de Dato", anchor='center', width=200)
+        tabla.column("Valor", anchor='center', width=150)
         
         for col in columnas:
             tabla.heading(col, text=col)
-            tabla.column(col, anchor='center', width=250)
         
         tabla.pack(fill=tk.BOTH, expand=True)
 
-        # Valores
         for simb in simbolos:
             tabla.insert("", tk.END, values=(
-                simb["nombre"], simb["categoria"], simb["tipo_dato"]
+                simb["nombre"], simb["categoria"], simb["tipo_dato"], simb["valor"]
             ))
 
-        # Scrollbar
         scroll_y = ttk.Scrollbar(ventana_tabla, orient="vertical", command=tabla.yview)
         tabla.configure(yscroll=scroll_y.set)
         scroll_y.pack(side="right", fill="y")

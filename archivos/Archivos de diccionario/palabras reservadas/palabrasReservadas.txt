@@ -13,3 +13,7 @@ tkinter
 PRINT
 token
 splitlines
+AND
+OR
+NOT
+in

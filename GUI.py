@@ -34,6 +34,7 @@ class Aplicacion:
             self.icono_abrir = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\img\imgOpen.png').subsample(50, 50)
             self.icono_analizar = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\img\imgAnalizar.png').subsample(20, 20)
             self.icono_sintactico = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\img\imgSintactico.png').subsample(20, 20)
+            self.icono_limpiar = PhotoImage(file=r'C:\Users\Ruddyard\Desktop\ProyEnGit\img\imglimpiar.png').subsample(4, 4)
         except:
             messagebox.showerror("Error", "No se pudieron cargar los iconos")
 
@@ -46,6 +47,7 @@ class Aplicacion:
         menu_archivo.add_command(label="Guardar", command=self.guardar, image=self.icono_guardar, compound=tk.LEFT)
         menu_archivo.add_command(label="Guardar como", command=self.guardar_como, image=self.icono_guardarComo, compound=tk.LEFT)
         menu_archivo.add_separator()
+        menu_archivo.add_command(label="Limpiar Todo", command=self.limpiar_todo, image=self.icono_limpiar, compound=tk.LEFT) 
         menu_archivo.add_command(label="Cerrar", command=self.cerrar, image=self.icono_cerrar, compound=tk.LEFT)
         menubar.add_cascade(label="Archivo", menu=menu_archivo)
 
@@ -54,6 +56,7 @@ class Aplicacion:
         menu_analizar.add_command(label="Análisis Léxico", command=self.analizar_lexico, image=self.icono_analizar, compound=tk.LEFT)
         menu_analizar.add_command(label="Análisis Sintáctico", command=self.analizar_sintactico, image=self.icono_sintactico, compound=tk.LEFT)
         menubar.add_cascade(label="Analizar", menu=menu_analizar)
+        
 
 
         menu_analizar.add_separator()
@@ -275,6 +278,25 @@ class Aplicacion:
 
     def configurar_drag_drop(self):
         self.scroll_text1.bind('<Double-Button-1>', self.abrir_archivo)
+    def limpiar_todo(self):
+        """Limpia todos los campos de texto y resetea los analizadores"""
+        respuesta = messagebox.askyesno(
+        "Limpiar Todo", 
+        "¿Confirma limpieza?"
+        )
+    
+        if respuesta:
+        
+            self.scroll_text1.delete('1.0', tk.END)  # Código fuente
+            self.scroll_text2.delete('1.0', tk.END)  # Tokens
+            self.terminal_text.delete('1.0', tk.END)  # Errores
+        
+        
+            self.analizador_lexico = Separador_Lexico()  
+            self.analizador_sintactico = AFD_analizar()
+        
+        
+            self.mostrar_estado("Todos los campos han sido limpiados")
 
 if __name__ == "__main__":
     root = tk.Tk()
