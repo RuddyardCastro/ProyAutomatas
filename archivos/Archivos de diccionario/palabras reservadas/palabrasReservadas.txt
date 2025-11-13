@@ -17,3 +17,4 @@ AND
 OR
 NOT
 in
+class

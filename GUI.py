@@ -23,8 +23,8 @@ class Aplicacion:
         # Inicializar  analizadores
         self.analizador_lexico = Separador_Lexico()
         self.analizador_sintactico = AFD_analizar()
-        self.tabla_simbolos = TablaSimbolos(self.root, self.analizador_lexico)
-        self.last_tokens = None # NUEVO: Almacena los tokens del último análisis
+        self.tabla_simbolos = TablaSimbolos(self.root)
+        self.last_tokens = None 
 
         
     def cargar_iconos(self):
@@ -72,7 +72,7 @@ class Aplicacion:
         # Marco superior para las DOS ventanas
         self.marco_superior = tk.PanedWindow(self.marco_principal, orient=tk.HORIZONTAL, bg="#f0f0f0")
         
-        # Ventana 1 - Código fuente
+        # Ventana 1 
         self.ventana1 = tk.LabelFrame(
             self.marco_superior, 
             text="Código Fuente", 
@@ -116,7 +116,7 @@ class Aplicacion:
         self.marco_superior.add(self.ventana1)
         self.marco_superior.add(self.ventana2)
         
-        # Ventana de "ERRORES SINTÁCTICOS"
+        # Ventana de errores sintacticos
         self.terminal = tk.LabelFrame(
             self.marco_principal,
             text="Errores Sintácticos",
@@ -148,12 +148,12 @@ class Aplicacion:
 
     
     def mostrar_tabla_simbolos(self):
-        # NUEVO: Comprueba que el análisis léxico haya sido ejecutado
+      #? Comprobacion
         if self.last_tokens is None:
             messagebox.showwarning("Advertencia", "Debe ejecutar primero el Análisis Léxico o Sintáctico para generar la Tabla de Símbolos.")
             return
 
-        # NUEVO: Llama a mostrar_tabla pasando la lista de tokens almacenada
+        # Llama a mostrar_tabla  
         self.tabla_simbolos.mostrar_tabla(self.last_tokens)
 
 
@@ -165,8 +165,7 @@ class Aplicacion:
             return
         try:
             tokens = self.analizador_lexico.separar_token(contenido)
-            self.last_tokens = tokens # NUEVO: Guarda los tokens
-
+            self.last_tokens = tokens 
             # Mostrar tokens en Ventana 2
             resultado_tokens = ""
             linea_actual = 0
@@ -243,7 +242,8 @@ class Aplicacion:
                     self.scroll_text1.insert(tk.END, contenido)
                     self.scroll_text2.delete('1.0', tk.END)
                     self.terminal_text.delete('1.0', tk.END)
-                    self.last_tokens = None # NUEVO: Resetea los tokens al cargar un archivo nuevo
+                #? Reset lo de la tabla
+                    self.last_tokens = None 
                     messagebox.showinfo("Éxito", f"Archivo cargado: {os.path.basename(file_path)}")
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir el archivo:\n{str(e)}")
@@ -268,6 +268,9 @@ class Aplicacion:
 
     def configurar_drag_drop(self):
         self.scroll_text1.bind('<Double-Button-1>', self.abrir_archivo)
+
+
+        #--- Limiar
     def limpiar_todo(self):
         """Limpia todos los campos de texto y resetea los analizadores"""
         respuesta = messagebox.askyesno(
@@ -277,17 +280,18 @@ class Aplicacion:
     
         if respuesta:
         
-            self.scroll_text1.delete('1.0', tk.END)  # Código fuente
-            self.scroll_text2.delete('1.0', tk.END)  # Tokens
-            self.terminal_text.delete('1.0', tk.END)  # Errores
-            self.last_tokens = None # NUEVO: Resetea los tokens
+            self.scroll_text1.delete('1.0', tk.END)  
+            self.scroll_text2.delete('1.0', tk.END) 
+            self.terminal_text.delete('1.0', tk.END)  
+            #lo de la tabla
+            self.last_tokens = None 
         
         
             self.analizador_lexico = Separador_Lexico()  
             self.analizador_sintactico = AFD_analizar()
         
         
-            # self.mostrar_estado("Todos los campos han sido limpiados") # Línea comentada, pero se deja el resto.
+           
 
 if __name__ == "__main__":
     root = tk.Tk()

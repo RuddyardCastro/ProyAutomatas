@@ -2,13 +2,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 class TablaSimbolos:
-    def __init__(self, root, analizador_lexico):
-        self.root = root
-        self.analizador_lexico = analizador_lexico
+    def __init__(self, root):
+        self.root = root   
 
 
+    #--Se usa abajo
     def detectar_tipo_dato(self, token):
-        """Clasifica valores (NUM, STR, ID, etc.)"""
         tipo = token["tipo"]
         valor = token["valor"]
 
@@ -26,6 +25,7 @@ class TablaSimbolos:
         return "desconocido"
 
 
+    #Val tab sinbolos
     def mostrar_tabla(self, tokens):
         if not tokens:
             messagebox.showwarning("No hay tokens para analizar")
@@ -38,10 +38,9 @@ class TablaSimbolos:
 
             tok = tokens[i]
 
-            # --------------------------------------------
-            # 1) ASIGNACIONES:    ID = valor
-            # --------------------------------------------
+           #val para ide
             if tok["tipo"] == "ID" and i+1 < len(tokens) and tokens[i+1]["valor"] == "=":
+
                 nombre = tok["valor"]
 
                 if i+2 < len(tokens):
@@ -59,11 +58,10 @@ class TablaSimbolos:
                 i += 3
                 continue
 
-            # --------------------------------------------
-            # 2) CICLO FOR:    for i in ...
-            # --------------------------------------------
+            #ciclos
             if tok["valor"] == "for" and i+1 < len(tokens) and tokens[i+1]["tipo"] == "ID":
-                nombre = tokens[i+1]["valor"]  # variable del ciclo
+
+                nombre = tokens[i+1]["valor"]
 
                 tabla_simbolos[nombre] = {
                     "nombre": nombre,
@@ -71,13 +69,21 @@ class TablaSimbolos:
                     "tipo": "iterador",
                     "valor": "for"
                 }
+            if tok["valor"] == "while" and i+1 < len(tokens) and tokens[i+1]["tipo"] == "ID":
+
+                nombre = tokens[i+1]["valor"]
+
+                tabla_simbolos[nombre] = {
+                    "nombre": nombre,
+                    "categoria": "ciclo",
+                    "tipo": "iterador",
+                    "valor": "while"
+                }
 
                 i += 1
                 continue
 
-            # --------------------------------------------
-            # 3) LLAMADAS A FUNCIÓN:   nombre(  )
-            # --------------------------------------------
+           #Funcones parametros
             if tok["tipo"] == "ID" and i+1 < len(tokens) and tokens[i+1]["valor"] == "(":
 
                 nombre = tok["valor"]
@@ -99,11 +105,19 @@ class TablaSimbolos:
                 i = j + 1
                 continue
 
+
+
+            if tok["tipo"] == "ID" and tok["valor"] not in tabla_simbolos:
+                 tabla_simbolos[tok["valor"]] = {
+                    "nombre": tok["valor"],
+                    "categoria": "variable",
+                    "tipo": "identificador",
+                    "valor": "-"
+                }
+
             i += 1
 
-        # --------------------------------------------
-        # Mostrar tabla en ventana
-        # --------------------------------------------
+       
 
         ventana = tk.Toplevel(self.root)
         ventana.title("Tabla de Símbolos")

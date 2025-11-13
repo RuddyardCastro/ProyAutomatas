@@ -35,8 +35,9 @@ class Separador_Lexico:
         if not palabra:
             return False
         #  Verificar que después del - hay contenido
+        # Solo hay un signo negativo
         if palabra[0] == '-':
-            if len(palabra) == 1:  # Solo hay un signo negativo
+            if len(palabra) == 1:  
                 return False
             palabra = palabra[1:]
         
@@ -47,7 +48,7 @@ class Separador_Lexico:
         partes = palabra.split('.')
         if len(partes) > 2:  
             return False
-        return all(p.isdigit() for p in partes if p)  #  validar partes no vacías
+        return all(p.isdigit() for p in partes if p) 
 
     def es_identificador(self, palabra):
         if not palabra:
