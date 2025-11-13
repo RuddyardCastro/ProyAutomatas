@@ -7,7 +7,7 @@ class Separador_Lexico:
         self.ops = self.cargar_operadores()
         self.prs = self._cargar_palabras_reservadas()
         self.patrones_tokens = self.cargar_patrones()
-        self.ops.sort(key=len, reverse=True)  # Ordenar operadores por longitud (más largos primero)
+        self.ops.sort(key=len, reverse=True)  
 
     
     def cargar_desde_archivo(self, ruta_archivo):
@@ -34,25 +34,25 @@ class Separador_Lexico:
     def es_numero(self, palabra):
         if not palabra:
             return False
-        # CORREGIDO: Verificar que después del '-' hay contenido
+        #  Verificar que después del - hay contenido
         if palabra[0] == '-':
             if len(palabra) == 1:  # Solo hay un signo negativo
                 return False
             palabra = palabra[1:]
         
-        # CORREGIDO: Manejar caso de punto decimal al inicio o final
+        #  Manejar caso de punto decimal al inicio o final
         if palabra.startswith('.') or palabra.endswith('.'):
             return False
             
         partes = palabra.split('.')
-        if len(partes) > 2:  # Más de un punto decimal
+        if len(partes) > 2:  
             return False
-        return all(p.isdigit() for p in partes if p)  # CORREGIDO: validar partes no vacías
+        return all(p.isdigit() for p in partes if p)  #  validar partes no vacías
 
     def es_identificador(self, palabra):
         if not palabra:
             return False
-        # CORREGIDO: Solo validar desde el segundo carácter en adelante
+        
         if palabra[0].isalpha() or palabra[0] == '_':
             return all(c.isalnum() or c == '_' for c in palabra[1:])
         return False
@@ -66,12 +66,12 @@ class Separador_Lexico:
             while i < len(linea):
                 cont = linea[i]
 
-                # Saltar espacios en blanco
+                #  espacios  
                 if cont.isspace():
                     i += 1
                     continue
 
-                # Detectar comentarios
+                
                 if cont == '#':
                     tokens_result.append({
                         'tipo': 'Coment',
@@ -80,7 +80,7 @@ class Separador_Lexico:
                     })
                     break
 
-                # Buscar operadores (priorizando los más largos)
+                
                 token_encontrado = False
                 for op in self.ops:
                     if linea[i:i+len(op)].upper() == op:
@@ -95,13 +95,13 @@ class Separador_Lexico:
                 if token_encontrado:
                     continue
 
-                # Detectar strings (manejo básico)
+                #str
                 if cont == '"':
                     fin = i + 1
                     while fin < len(linea) and linea[fin] != '"':
                         fin += 1
                     if fin < len(linea):
-                        fin += 1  # Incluir la comilla de cierre
+                        fin += 1  
                     palabra = linea[i:fin]
                     tokens_result.append({
                         'tipo': 'STR',
@@ -111,7 +111,7 @@ class Separador_Lexico:
                     i = fin
                     continue
 
-                # Construir token (identificadores, números, etc.)
+                
                 palabra = ""
                 if cont.isalnum() or cont == '_':
                     palabra += linea[i]
@@ -120,11 +120,11 @@ class Separador_Lexico:
                         palabra += linea[i]
                         i += 1
                 else:
-                    # CORREGIDO: Recolectar caracteres consecutivos no alfanuméricos
+                    
                     palabra = cont
                     i += 1
                     while i < len(linea) and not (linea[i].isalnum() or linea[i].isspace() or linea[i] == '_' or linea[i] == '"'):
-                        # Verificar si el siguiente carácter forma un operador conocido
+                
                         posible_op = palabra + linea[i]
                         op_encontrado = any(op.startswith(posible_op.upper()) for op in self.ops)
                         if not op_encontrado:
@@ -135,7 +135,7 @@ class Separador_Lexico:
                 if palabra:
                     palabra_up = palabra.upper()
 
-                    # Jerarquía de clasificación de tokens
+                
                     if palabra_up in self.prs:
                         tokens_result.append({
                             'tipo': 'PR',
@@ -160,7 +160,7 @@ class Separador_Lexico:
                         })
                         continue
 
-                    # CORREGIDO: Marcar como ERROR en lugar de ID por defecto
+                    
                     tokens_result.append({
                         'tipo': 'ERROR',
                         'valor': palabra,

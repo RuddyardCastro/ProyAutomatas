@@ -24,6 +24,7 @@ class Aplicacion:
         self.analizador_lexico = Separador_Lexico()
         self.analizador_sintactico = AFD_analizar()
         self.tabla_simbolos = TablaSimbolos(self.root, self.analizador_lexico)
+        self.last_tokens = None # NUEVO: Almacena los tokens del último análisis
 
         
     def cargar_iconos(self):
@@ -147,28 +148,13 @@ class Aplicacion:
 
     
     def mostrar_tabla_simbolos(self):
-        contenido = self.scroll_text1.get('1.0', tk.END)
-        self.tabla_simbolos.mostrar_tabla(contenido)
+        # NUEVO: Comprueba que el análisis léxico haya sido ejecutado
+        if self.last_tokens is None:
+            messagebox.showwarning("Advertencia", "Debe ejecutar primero el Análisis Léxico o Sintáctico para generar la Tabla de Símbolos.")
+            return
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        # NUEVO: Llama a mostrar_tabla pasando la lista de tokens almacenada
+        self.tabla_simbolos.mostrar_tabla(self.last_tokens)
 
 
     # ------------------ Análisis Léxico ------------------
@@ -179,7 +165,8 @@ class Aplicacion:
             return
         try:
             tokens = self.analizador_lexico.separar_token(contenido)
-            
+            self.last_tokens = tokens # NUEVO: Guarda los tokens
+
             # Mostrar tokens en Ventana 2
             resultado_tokens = ""
             linea_actual = 0
@@ -209,6 +196,8 @@ class Aplicacion:
         try:
             #  Separar tokens
             tokens = self.analizador_lexico.separar_token(contenido)
+            self.last_tokens = tokens # NUEVO: Guarda los tokens
+            
             # Analizar sintaxis
             errores = self.analizador_sintactico.analizar_sintaxis(tokens)
             
@@ -254,6 +243,7 @@ class Aplicacion:
                     self.scroll_text1.insert(tk.END, contenido)
                     self.scroll_text2.delete('1.0', tk.END)
                     self.terminal_text.delete('1.0', tk.END)
+                    self.last_tokens = None # NUEVO: Resetea los tokens al cargar un archivo nuevo
                     messagebox.showinfo("Éxito", f"Archivo cargado: {os.path.basename(file_path)}")
             except Exception as e:
                 messagebox.showerror("Error", f"No se pudo abrir el archivo:\n{str(e)}")
@@ -290,13 +280,14 @@ class Aplicacion:
             self.scroll_text1.delete('1.0', tk.END)  # Código fuente
             self.scroll_text2.delete('1.0', tk.END)  # Tokens
             self.terminal_text.delete('1.0', tk.END)  # Errores
+            self.last_tokens = None # NUEVO: Resetea los tokens
         
         
             self.analizador_lexico = Separador_Lexico()  
             self.analizador_sintactico = AFD_analizar()
         
         
-            self.mostrar_estado("Todos los campos han sido limpiados")
+            # self.mostrar_estado("Todos los campos han sido limpiados") # Línea comentada, pero se deja el resto.
 
 if __name__ == "__main__":
     root = tk.Tk()
